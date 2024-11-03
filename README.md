@@ -1,2 +1,2 @@
 # Concurrency
-Simple concurrent facilities written in C++
+Simple C++ concurrency tools
