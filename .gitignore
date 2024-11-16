@@ -32,8 +32,10 @@
 *.app
 
 
-# build folder
+# build folders
 build/
+cmake-build-debug/
+cmake-build-release/
 
 # IDEs
 .idea/
