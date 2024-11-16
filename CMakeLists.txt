@@ -21,3 +21,4 @@ add_compile_options(-Wtype-limits)            	# size_t - size_t >= 0 -> always 
 
 add_subdirectory(concurrent_queue)
 add_subdirectory(threadpool)
+add_subdirectory(algorithms)
