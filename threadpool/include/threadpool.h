@@ -129,10 +129,7 @@ public:
 		std::packaged_task<FuncReturnType()> packaged_task(function);
 		auto future = packaged_task.get_future();
 
-        const bool push_succeed = _tasks.push([task = std::move(packaged_task)]() mutable
-							{
-								task();
-							});
+        const bool push_succeed = _tasks.push(std::move(packaged_task));
 
 		if (!push_succeed)
 		{
