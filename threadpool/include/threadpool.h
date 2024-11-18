@@ -90,15 +90,7 @@ private:
 	{
 		while (!_done.test(std::memory_order_relaxed))
 		{
-			auto task = _tasks.pop();
-			if (task.has_value())
-			{
-				task.value()();
-			}
-			else
-			{
-				std::this_thread::yield();
-			}
+			runPendingTask();
 		}
 	}
 
@@ -121,6 +113,18 @@ public:
 		_done.test_and_set(std::memory_order_relaxed);
 	}
 
+	void runPendingTask ()
+    {
+    	auto task = _tasks.pop();
+    	if (task.has_value())
+    	{
+    		task.value()();
+    	}
+    	else
+    	{
+    		std::this_thread::yield();
+    	}
+    }
 
 	template<typename Func>
 	std::optional<std::future<std::invoke_result_t<Func>>> submit (Func function)
