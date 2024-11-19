@@ -66,13 +66,10 @@ std::list<T> ThreadPoolQuickSort(std::list<T> input, ThreadPool& thread_pool)
     lower_part.splice(lower_part.end(),input,input.begin(),
     divide_point);
 
-    auto new_lower
-    (
-        thread_pool.submit([&thread_pool, &lower_part] ()
+    auto new_lower = thread_pool.submit([&thread_pool, &lower_part] ()
         {
             return ThreadPoolQuickSort<T>(std::move(lower_part), thread_pool);
-        })
-    );
+        });
 
     if (!new_lower.has_value()) [[unlikely]]
     {
