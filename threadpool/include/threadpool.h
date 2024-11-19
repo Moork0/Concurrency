@@ -84,10 +84,14 @@ class ThreadPool
 private:
 	std::atomic_flag					_done;
     std::vector<std::jthread>           _threads;
-    ConcurrentQueue<MovableFunction>	_tasks;
+    ConcurrentQueue<MovableFunction>	_global_tasks;
+
+	inline static thread_local std::deque<MovableFunction>	_local_tasks;
+	inline static thread_local bool							_is_a_pool_thread;
 
     void workerFunc()
 	{
+    	_is_a_pool_thread = true;
 		while (!_done.test(std::memory_order_relaxed))
 		{
 			runPendingTask();
@@ -113,17 +117,30 @@ public:
 		_done.test_and_set(std::memory_order_relaxed);
 	}
 
+	static bool isCurrentThreadAPoolThread ()
+    {
+	    return _is_a_pool_thread;
+    }
+
 	void runPendingTask ()
     {
-    	auto task = _tasks.pop();
+    	if (!_local_tasks.empty())
+    	{
+    		MovableFunction task = std::move(_local_tasks.front());
+    		_local_tasks.pop_front();
+			task();
+    		return;
+    	}
+
+    	auto task = _global_tasks.pop();
     	if (task.has_value())
     	{
     		task.value()();
+    		return;
     	}
-    	else
-    	{
-    		std::this_thread::yield();
-    	}
+
+    	// No task in the task queues. Yield the thread to the OS.
+    	std::this_thread::yield();
     }
 
 	template<typename Func>
@@ -133,12 +150,18 @@ public:
 		std::packaged_task<FuncReturnType()> packaged_task(function);
 		auto future = packaged_task.get_future();
 
-        const bool push_succeed = _tasks.push(std::move(packaged_task));
-
-		if (!push_succeed)
-		{
-			return std::nullopt;
-		}
+    	if (isCurrentThreadAPoolThread())
+    	{
+			_local_tasks.push_back(std::move(packaged_task));
+    	}
+    	else
+    	{
+    		const bool push_succeed = _global_tasks.push(std::move(packaged_task));
+			if (!push_succeed)
+			{
+				return std::nullopt;
+			}
+    	}
 
 		return future;
 	}

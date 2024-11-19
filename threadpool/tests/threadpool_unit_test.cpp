@@ -42,3 +42,22 @@ TEST(ThreadPool, SubmitAndReceiveFunctionDoneSignalTest)
 	ASSERT_EQ(lambda_res_fut.wait_for(std::chrono::seconds(1)), std::future_status::ready);
 	EXPECT_TRUE(latch.try_wait());
 }
+
+TEST(ThreadPool, FirstSubmitIsOnGlobalQueueSecondIsOnLocalQueue)
+{
+    Concurrency::ThreadPool thread_pool;
+    ASSERT_FALSE(thread_pool.isCurrentThreadAPoolThread());
+
+    auto res = thread_pool.submit([&thread_pool]()
+    {
+        EXPECT_TRUE(thread_pool.isCurrentThreadAPoolThread());
+
+        auto inner_res = thread_pool.submit(dummyFunction);
+        thread_pool.runPendingTask();
+
+        EXPECT_EQ(inner_res.value().get(), return_number);
+    });
+
+    ASSERT_TRUE(res.has_value());
+    ASSERT_EQ(res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+}
