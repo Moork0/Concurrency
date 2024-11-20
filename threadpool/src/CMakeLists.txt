@@ -1,20 +1,18 @@
-#set(
-#	SRCS
-#	threadpool.cpp
-#)
+set(
+	SRCS
+	threadpool.cpp
+)
 
-
-add_library(ThreadPool INTERFACE)
-
+add_library(ThreadPool threadpool.cpp)
 add_dependencies(ThreadPool Concurrency::Queue)
 
 target_include_directories(ThreadPool
-		INTERFACE
+		PUBLIC
 			../include
 )
 
 target_link_libraries(ThreadPool
-	INTERFACE
+	PUBLIC
 	    Threads::Threads
 		Concurrency::Queue
 )
