@@ -8,6 +8,9 @@
 
 namespace Concurrency {
 
+// FIXME: Replace this with a lock-free queue
+// TODO: Implement a lock-free ring-buffer queue
+
 template<typename T>
 class ConcurrentQueue
 {
