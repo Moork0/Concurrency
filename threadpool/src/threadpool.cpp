@@ -45,29 +45,6 @@ void ThreadPool::runPendingTask ()
     std::this_thread::yield();
 }
 
-// template<typename Func>
-// std::optional<std::future<std::invoke_result_t<Func>>> ThreadPool::submit (Func function)
-// {
-//     using FuncReturnType = std::invoke_result_t<Func>;
-//     std::packaged_task<FuncReturnType()> packaged_task(function);
-//     auto future = packaged_task.get_future();
-//
-//     if (isCurrentThreadAPoolThread())
-//     {
-//         _local_tasks.push_back(std::move(packaged_task));
-//     }
-//     else
-//     {
-//         const bool push_succeed = _global_tasks.push(std::move(packaged_task));
-//         if (!push_succeed)
-//         {
-//             return std::nullopt;
-//         }
-//     }
-//
-//     return future;
-// }
-
 void ThreadPool::workerFunc()
 {
     _is_a_pool_thread = true;
