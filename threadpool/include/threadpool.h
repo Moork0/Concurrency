@@ -82,14 +82,87 @@ public:
 class ThreadPool
 {
 private:
+	class WorkStealingQueue
+	{
+	private:
+		using ElemT = MovableFunction;
+
+		mutable std::mutex _queue_mutex;
+		std::deque<ElemT>      _queue;
+
+	public:
+
+		WorkStealingQueue	() = default;
+		~WorkStealingQueue	() = default;
+
+		WorkStealingQueue (WorkStealingQueue&& other) noexcept
+		{
+			std::swap(_queue, other._queue);
+		}
+
+		WorkStealingQueue& operator= (WorkStealingQueue&& other) noexcept
+		{
+			std::swap(_queue, other._queue);
+			return *this;
+		}
+
+		WorkStealingQueue				(const WorkStealingQueue& other) = delete;
+		WorkStealingQueue& operator=	(const WorkStealingQueue& other) = delete;
+
+		bool enqueue (ElemT element)
+		{
+			std::scoped_lock lock(_queue_mutex);
+			try
+			{
+				_queue.push_front(std::move(element));
+				return true;
+
+			} catch (std::exception &)
+			{
+				return false;
+			}
+		}
+
+		std::optional<ElemT> dequeue()
+		{
+			std::scoped_lock lock(_queue_mutex);
+			if (_queue.empty())
+			{
+				return std::nullopt;
+			}
+
+			ElemT result = std::move(_queue.front());
+			_queue.pop_front();
+
+			return result;
+		}
+
+		std::optional<ElemT> steal()
+		{
+			std::scoped_lock lock(_queue_mutex);
+			if (_queue.empty())
+			{
+				return std::nullopt;
+			}
+
+			ElemT result = std::move(_queue.back());
+			_queue.pop_back();
+
+			return result;
+		}
+	};
+
 	std::atomic_flag					_done;
-    std::vector<std::jthread>           _threads;
     ConcurrentQueue<MovableFunction>	_global_tasks;
+	std::vector<WorkStealingQueue>		_local_tasks_queues;
+    std::vector<std::jthread>           _threads;
 
-	inline static thread_local std::deque<MovableFunction>	_local_tasks;
-	inline static thread_local bool							_is_a_pool_thread;
+	inline static thread_local WorkStealingQueue*	_this_thread_local_tasks	= nullptr;
+	inline static thread_local size_t				_this_thread_idx			= 0;
 
-    void workerFunc();
+    void workerFunc (size_t thread_index);
+
+	std::optional<MovableFunction> stealTasksFromOtherThreads ();
 
 public:
     explicit ThreadPool(size_t number_of_threads = std::thread::hardware_concurrency());
@@ -106,9 +179,13 @@ public:
 		std::packaged_task<FuncReturnType()> packaged_task(function);
 		auto future = packaged_task.get_future();
 
-    	if (isCurrentThreadAPoolThread())
+		if (isCurrentThreadAPoolThread())
 		{
-			_local_tasks.push_back(std::move(packaged_task));
+			const bool push_succeed = _this_thread_local_tasks->enqueue(std::move(packaged_task));
+			if (!push_succeed)
+			{
+				return std::nullopt;
+			}
 		}
 		else
 		{
