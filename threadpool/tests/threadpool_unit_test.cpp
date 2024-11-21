@@ -64,3 +64,47 @@ TEST(ThreadPool, FirstSubmitIsOnGlobalQueueSecondIsOnLocalQueue)
     ASSERT_TRUE(res.has_value());
     ASSERT_EQ(res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
 }
+
+TEST(ThreadPool, LocalTasksShouldBeLIFO)
+{
+    Concurrency::ThreadPool thread_pool(1);
+    ASSERT_FALSE(thread_pool.isCurrentThreadAPoolThread());
+
+    auto res = thread_pool.submit([&thread_pool]()
+    {
+        EXPECT_TRUE(thread_pool.isCurrentThreadAPoolThread());
+
+        auto inner_res = thread_pool.submit(dummyFunction);
+        auto inner_res2 = thread_pool.submit(dummyFunction);
+
+        thread_pool.runPendingTask();
+        ASSERT_EQ(inner_res2.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+        EXPECT_EQ(inner_res2.value().get(), return_number);
+
+        thread_pool.runPendingTask();
+        ASSERT_EQ(inner_res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+        EXPECT_EQ(inner_res.value().get(), return_number);
+    });
+
+    ASSERT_TRUE(res.has_value());
+    ASSERT_EQ(res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+}
+
+TEST(ThreadPool, TaskFromLocalQueueShouldGetStolen)
+{
+    Concurrency::ThreadPool thread_pool;
+    ASSERT_FALSE(thread_pool.isCurrentThreadAPoolThread());
+
+    auto res = thread_pool.submit([&thread_pool]()
+    {
+        EXPECT_TRUE(thread_pool.isCurrentThreadAPoolThread());
+
+        auto inner_res = thread_pool.submit(dummyFunction);
+
+        ASSERT_EQ(inner_res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+        EXPECT_EQ(inner_res.value().get(), return_number);
+    });
+
+    ASSERT_TRUE(res.has_value());
+    ASSERT_EQ(res.value().wait_for(std::chrono::seconds(1)), std::future_status::ready);
+}
