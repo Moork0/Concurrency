@@ -42,7 +42,7 @@ TEST_F(QuickSortTest, ManualThreadingCorrectnessTest)
 
 TEST_F(QuickSortTest, ThreadPoolCorrectnessTest)
 {
-    std::list<int> numbers_lst = generateRandomizedList(5'000);
+    std::list<int> numbers_lst = generateRandomizedList(10'000);
     ThreadPool thread_pool;
 
     ASSERT_FALSE(std::is_sorted(numbers_lst.begin(), numbers_lst.end()));
