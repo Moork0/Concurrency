@@ -33,7 +33,10 @@ TEST(ThreadPool, SubmitAndReceiveFunctionDoneSignalTest)
 
 
 	std::latch latch(1);
-	auto lambda_result = thread_pool.submit([&latch](){ latch.count_down(); });
+	auto lambda_result = thread_pool.submit([&latch]()
+	{
+	    latch.count_down();
+	});
 
 	ASSERT_TRUE(lambda_result.has_value());
 
