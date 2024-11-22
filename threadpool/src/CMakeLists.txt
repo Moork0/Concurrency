@@ -3,7 +3,6 @@ add_dependencies(ThreadPool Concurrency::Queue)
 
 target_include_directories(ThreadPool
 		INTERFACE
-			../internal
 			../include
 )
 
