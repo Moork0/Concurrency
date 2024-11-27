@@ -28,7 +28,7 @@ private:
 	inline static thread_local WorkStealingQueue*	_this_thread_local_tasks	= nullptr;
 	inline static thread_local size_t				_this_thread_idx			= 0;
 
-    void workerFunc (size_t thread_index)
+    void workerFunc (const size_t thread_index)
     {
     	_this_thread_idx = thread_index;
     	_this_thread_local_tasks = &_local_tasks_queues[thread_index];
