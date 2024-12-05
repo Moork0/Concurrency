@@ -7,7 +7,7 @@
 #include <atomic>
 #include <memory>
 
-#include "concurrent_queue.h"
+#include "lock_based_queue.h"
 #include "internal/movable_function.h"
 #include "internal/work_stealing_queue.h"
 

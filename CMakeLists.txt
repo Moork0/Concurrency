@@ -19,6 +19,7 @@ add_compile_options(-Wsign-compare)
 add_compile_options(-Wtype-limits)            	# size_t - size_t >= 0 -> always true
 
 
-add_subdirectory(concurrent_queue)
+add_subdirectory(containers)
+add_subdirectory(utils)
 add_subdirectory(threadpool)
 add_subdirectory(algorithms)

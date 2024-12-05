@@ -7,7 +7,7 @@
 #include <numeric>
 #include <thread>
 
-#include "concurrent_queue.h"
+#include "lock_based_queue.h"
 
 namespace {
 
