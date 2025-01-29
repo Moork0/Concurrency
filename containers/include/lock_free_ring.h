@@ -88,7 +88,7 @@ public:
         }
 
         _ring[head & size_mask] = std::move(item);
-        _head.store(head + 1, std::memory_order_release);
+        _head.store(head + 1, std::memory_order_relaxed);
 
         return true;
     }
@@ -103,7 +103,7 @@ public:
         }
 
         T item = std::move(_ring[tail & size_mask]);
-        _tail.store(tail + 1, std::memory_order_release);
+        _tail.store(tail + 1, std::memory_order_relaxed);
         return item;
     }
 };
