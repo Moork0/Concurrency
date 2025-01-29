@@ -91,6 +91,8 @@ BENCHMARK_DEFINE_F(ConcurrentQueueFixture, EnqueueDequeueMPMC)(benchmark::State&
     {
         case 0:
         case 1:
+        case 4:
+        case 5:
             for (auto _ : state)
             {
                 for (int i = 0; i < number_of_elements / 2; ++i)
@@ -102,6 +104,8 @@ BENCHMARK_DEFINE_F(ConcurrentQueueFixture, EnqueueDequeueMPMC)(benchmark::State&
 
         case 2:
         case 3:
+        case 6:
+        case 7:
             for (auto _ : state)
             {
                 while (received_elements.load(std::memory_order_relaxed) < number_of_elements)
@@ -115,4 +119,4 @@ BENCHMARK_DEFINE_F(ConcurrentQueueFixture, EnqueueDequeueMPMC)(benchmark::State&
         break;
     }
 }
-BENCHMARK_REGISTER_F(ConcurrentQueueFixture, EnqueueDequeueMPMC)->Threads(4)->Range(8, 8 << 17);
+BENCHMARK_REGISTER_F(ConcurrentQueueFixture, EnqueueDequeueMPMC)->Threads(4)->Threads(8)->Range(8, 8 << 17);
