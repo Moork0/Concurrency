@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <future>
-#include <iostream>
 #include <latch>
 #include <numeric>
 #include <thread>
@@ -13,16 +12,16 @@ namespace {
 
 struct EnqueueFuncArgs
 {
-    Concurrency::ConcurrentQueue<int> &queue;
-    std::latch                        &latch;
-    int                                min;
-    int                                max;
+    Concurrency::ConcurrentQueue<int>&  queue;
+    std::latch&                         latch;
+    int                                 min;
+    int                                 max;
 };
 
 struct DequeueFuncArgs
 {
-    Concurrency::ConcurrentQueue<int> &queue;
-    std::latch                        &latch;
+    Concurrency::ConcurrentQueue<int>&  queue;
+    std::latch&                         latch;
 };
 
 void enqueueFunc(EnqueueFuncArgs args)
