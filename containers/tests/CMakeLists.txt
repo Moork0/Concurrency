@@ -3,6 +3,7 @@ find_package(GTest REQUIRED)
 add_executable(
     ${PROJECT_NAME}_test
 	lock_based_queue_unit_test.cpp
+	lock_free_ring_unit_test.cpp
 )
 
 target_link_libraries(
