@@ -88,17 +88,18 @@ TEST(LockFreeRing, PressureTest)
 {
     Concurrency::LockFreeRing<int, 4096> queue;
     std::latch                        latch(2);
+    constexpr size_t                  num_of_elems = 50'000;
 
     std::jthread enqueue_thread(enqueueFunc<4096>,
-                                 EnqueueFuncArgs{.queue = queue, .latch = latch, .number_of_elems = 10000});
+                                 EnqueueFuncArgs{.queue = queue, .latch = latch, .number_of_elems = num_of_elems});
 
     auto dequeue_fut = std::async(std::launch::async, dequeueFunc<4096>, DequeueFuncArgs{.queue = queue, .latch = latch});
 
-    std::vector<int> dequeued_nums(10000, 0);
+    std::vector<int> dequeued_nums(num_of_elems, 0);
 
     std::vector<int> dequeue_res = dequeue_fut.get();
 
-    ASSERT_EQ(dequeue_res.size(), 10000);
+    ASSERT_EQ(dequeue_res.size(), num_of_elems);
 
     for (const int element : dequeue_res)
     {
