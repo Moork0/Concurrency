@@ -3,6 +3,8 @@ find_package(benchmark REQUIRED)
 add_executable(
     ${PROJECT_NAME}_test_benchmark
 	lock_based_queue_bm.cpp
+	lock_free_ring_bm.cpp
+	moody_camel_ring_bm.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_test_benchmark Concurrency::Containers)
