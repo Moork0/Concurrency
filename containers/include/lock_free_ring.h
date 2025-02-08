@@ -73,6 +73,15 @@ public:
     LockFreeRing& operator= (const LockFreeRing&) = delete;
     LockFreeRing& operator= (LockFreeRing&&) = delete;
 
+    [[nodiscard]] constexpr uint32_t freeSpace() const noexcept
+    {
+        return capacity + _tail.load(std::memory_order_seq_cst) - _head.load(std::memory_order_seq_cst);
+    }
+
+    [[nodiscard]] constexpr uint32_t size() const noexcept
+    {
+        return _head.load(std::memory_order_seq_cst) - _tail.load(std::memory_order_seq_cst);
+    }
 
     bool enqueue (T item) noexcept requires (RING_TYPE == LockFreeRingType::SPSC)
     {
