@@ -18,27 +18,26 @@ enum class LockFreeRingType
     SPSC
 };
 
-template<typename T, size_t N, LockFreeRingType RING_TYPE = LockFreeRingType::SPSC>
-requires (std::has_single_bit(N))
+template<typename T, uint32_t N, LockFreeRingType RING_TYPE = LockFreeRingType::SPSC>
 class LockFreeRing
 {
 private:
-    static constexpr size_t cache_line_size = 64;
+    static constexpr uint32_t cache_line_size = 64;
 
     alignas(cache_line_size) T* _ring;
 
     alignas(cache_line_size) std::atomic<uint32_t> _head;
     alignas(cache_line_size) std::atomic<uint32_t> _tail;
 
-    static constexpr size_t size_mask = N - 1;
-    static constexpr size_t capacity = size_mask;
+    static constexpr uint32_t size_mask = N - 1;
+    static constexpr uint32_t capacity = size_mask;
 
-    [[nodiscard]] constexpr size_t freeSpace(const uint32_t head, const uint32_t tail) const noexcept
+    [[nodiscard]] constexpr uint32_t freeSpace(const uint32_t head, const uint32_t tail) const noexcept
     {
         return capacity + tail - head;
     }
 
-    [[nodiscard]] constexpr size_t size(const uint32_t head, const uint32_t tail) const noexcept
+    [[nodiscard]] constexpr uint32_t size(const uint32_t head, const uint32_t tail) const noexcept
     {
         return head - tail;
     }
