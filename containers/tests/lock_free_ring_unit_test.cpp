@@ -11,7 +11,7 @@
 
 namespace {
 
-template <size_t RingSize>
+template <uint32_t RingSize>
 struct EnqueueFuncArgs
 {
     Concurrency::LockFreeRing<int, RingSize>&   queue;
@@ -19,14 +19,14 @@ struct EnqueueFuncArgs
     int                                         number_of_elems;
 };
 
-template <size_t RingSize>
+template <uint32_t RingSize>
 struct DequeueFuncArgs
 {
     Concurrency::LockFreeRing<int, RingSize>&   queue;
     std::latch&                                 latch;
 };
 
-template <size_t RingSize>
+template <uint32_t RingSize>
 void enqueueFunc(EnqueueFuncArgs<RingSize> args)
 {
     args.latch.arrive_and_wait();
@@ -41,7 +41,7 @@ void enqueueFunc(EnqueueFuncArgs<RingSize> args)
     }
 }
 
-template <size_t RingSize>
+template <uint32_t RingSize>
 std::vector<int> dequeueFunc(DequeueFuncArgs<RingSize> args)
 {
     std::vector<int> result;
