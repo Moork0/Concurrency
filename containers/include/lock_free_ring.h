@@ -4,7 +4,7 @@
 #include <atomic>
 #include <cstdint>
 #include <optional>
-#include <stdexcept>
+
 
 /**
  * This file contains a lock-free ring buffer implementation.
@@ -57,10 +57,7 @@ public:
     LockFreeRing ()
         : _ring(nullptr), _head(0), _tail(0)
     {
-        if (!isPowerOf2(N))
-        {
-            throw std::runtime_error("LockFreeRing size is not a power of 2");
-        }
+        static_assert(isPowerOf2(N), "LockFreeRing size must be a power of 2");
 
         _ring = new T[N];
     }
