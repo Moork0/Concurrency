@@ -1,0 +1,96 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "generator": "Ninja",
+      "binaryDir": "build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release",
+      "generator": "Ninja",
+      "binaryDir": "build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "release-with-debug-info",
+      "displayName": "RelWithDebInfo",
+      "generator": "Ninja",
+      "binaryDir": "build/relwithdebinfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "debug-with-benchmark",
+      "inherits": "debug",
+      "binaryDir": "build/debug-with-benchmark",
+      "cacheVariables": {
+        "BUILD_BENCHMARK": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "release-with-benchmark",
+      "inherits": "release",
+      "binaryDir": "build/rel-with-benchmark",
+      "cacheVariables": {
+        "BUILD_BENCHMARK": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "debug-ci-gcc",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug Build",
+      "configurePreset": "debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "displayName": "Release Build",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-with-debug-info",
+      "displayName": "Release with debug info Build",
+      "configurePreset": "release-with-debug-info",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "debug-with-benchmark",
+      "displayName": "Debug with benchmarks",
+      "configurePreset": "debug-with-benchmark",
+      "configuration": "Debug"
+    },
+    {
+      "name": "release-with-benchmark",
+      "displayName": "Debug with benchmarks",
+      "configurePreset": "release-with-benchmark",
+      "configuration": "Release"
+    }
+  ]
+}
+
