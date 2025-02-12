@@ -13,3 +13,7 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME}_test)
+
+if(BUILD_BENCHMARK)
+	add_subdirectory(benchmark)
+endif ()
